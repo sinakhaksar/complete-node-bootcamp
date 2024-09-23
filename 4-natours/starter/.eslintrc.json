@@ -13,7 +13,7 @@
 
 		"spaced-comment": "off",
 		"indent": ["error", "tab"], // Ensure this is set to "tab"
-		"no-console": "warn",
+		"no-console": "off",
 		"consistent-return": "off",
 		"func-names": "off",
 		"object-shorthand": "off",
