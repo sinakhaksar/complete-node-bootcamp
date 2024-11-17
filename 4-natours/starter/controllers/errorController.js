@@ -19,7 +19,7 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleJWTError = () =>
-	new AppError("Invalid token. Please log in agin!", 401);
+	new AppError("Invalid token. Please log in again!", 401);
 
 const handleExpiredError = () =>
 	new AppError("Your token has expired! Please log in again.", 401);
