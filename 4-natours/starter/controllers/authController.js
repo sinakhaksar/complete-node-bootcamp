@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const sendEmail = require("../utils/email");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
@@ -62,7 +63,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 	) {
 		token = req.headers.authorization.split(" ")[1];
 	}
-	// console.log(token);
 	if (!token)
 		return next(
 			new AppError(
@@ -103,7 +103,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
 	return (req, res, next) => {
-		console.log(roles);
 		// roles is an arr -> ['admin', 'lead-guide']
 		if (!roles.includes(req.user.role)) {
 			return next(
@@ -117,3 +116,45 @@ exports.restrictTo = (...roles) => {
 		next();
 	};
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+	// 1) if there is an accout for the email,
+	const user = await User.findOne({ email: req.body.email });
+
+	if (!user) return next(new AppError("no account of this email", 404));
+
+	// 2) Generate the random rest token
+	const resetToken = user.createPasswordResetToken();
+
+	await user.save({ validateBeforeSave: false });
+
+	// 3) send it to user's eamil
+	const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+
+	const message = `Forgot your Password? Submit a Patch request with your new password to : \n${resetURL}\nif you did't, Please ignore this email!`;
+
+	try {
+		await sendEmail({
+			email: user.email,
+			subject: "Password reset Token(valid for 5 minutes)",
+			message,
+		});
+		res.status(200).json({
+			status: "success",
+			message: "token sent to eamil",
+		});
+	} catch (err) {
+		user.passwordResetToken = undefined;
+		user.passwordResetExpires = undefined;
+		await user.save({ validateBeforeSave: false });
+
+		return next(
+			new AppError(
+				"there was an error sending email, try again later! ",
+				500,
+			),
+		);
+	}
+});
+
+exports.resetPassword = async (req, res, next) => {};
