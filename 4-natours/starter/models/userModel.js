@@ -54,6 +54,15 @@ userSchema.pre("save", async function (next) {
 	next();
 });
 
+userSchema.pre("save", function (next) {
+	if (!this.isModified("password") || this.isNew) return next();
+
+	this.passwordChangedAt = Date.now() - 2500; // some times the document saves before the token is made...
+	//so the in 'login' there is a check that does not let
+	//user to log in so we - 2.5 sec the time to get it an edge
+	next();
+});
+
 userSchema.methods.correctPassword = async function (
 	canadiatePassword,
 	userPassword,
