@@ -157,4 +157,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 	}
 });
 
-exports.resetPassword = async (req, res, next) => {};
+exports.resetPassword = async (req, res, next) => {
+	console.log(req);
+};
