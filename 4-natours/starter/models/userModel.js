@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { type } = require("os");
 
 const userSchema = new mongoose.Schema({
 	name: {
@@ -41,6 +42,11 @@ const userSchema = new mongoose.Schema({
 	passwordResetExpires: Date,
 	passwordChangedAt: Date,
 	createdAt: { type: Date, default: Date.now },
+	active: {
+		type: Boolean,
+		default: true,
+		select: false,
+	},
 });
 
 userSchema.pre("save", async function (next) {
@@ -60,6 +66,12 @@ userSchema.pre("save", function (next) {
 	this.passwordChangedAt = Date.now() - 2500; // some times the document saves before the token is made...
 	//so the in 'login' there is a check that does not let
 	//user to log in so we - 2.5 sec the time to get it an edge
+	next();
+});
+
+userSchema.pre(/^find/, function (next) {
+	//this points to the current query
+	this.find({ active: { $ne: false } });
 	next();
 });
 

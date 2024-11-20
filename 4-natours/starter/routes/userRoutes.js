@@ -15,6 +15,7 @@ router.patch(
 	authController.uodatePassword,
 );
 router.patch("/updateMe", authController.protect, userController.updateMe); // update data by user, when loged in
+router.delete("/deleteMe", authController.protect, userController.deleteMe); // set ative to false
 
 router
 	.route("/")
