@@ -14,6 +14,7 @@ router.patch(
 	authController.protect,
 	authController.uodatePassword,
 );
+router.patch("/updateMe", authController.protect, userController.updateMe); // update data by user, when loged in
 
 router
 	.route("/")

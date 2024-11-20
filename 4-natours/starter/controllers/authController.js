@@ -199,6 +199,3 @@ exports.uodatePassword = catchAsync(async (req, res, next) => {
 	// 4) log user in, send JWT
 	createSendToken(user, 200, res);
 });
-
-// const user = User.findById(req.user._id);
-// console.log(user);
