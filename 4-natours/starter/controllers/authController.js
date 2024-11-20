@@ -9,6 +9,17 @@ const crypto = require("crypto");
 const createSendToken = (user, statusCode, res) => {
 	const token = signToken(user._id);
 
+	const cookieOptios = {
+		expires: new Date(
+			Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 86_400_000,
+		), // in milllisecnds:
+		httpOnly: true,
+	};
+	if (process.env.NODE_ENV === "production") cookieOptios.secure = true;
+	res.cookie("jwt", token, cookieOptios);
+	//remove password form output
+	user.password = undefined;
+
 	res.status(statusCode).json({
 		status: "success",
 		token,
