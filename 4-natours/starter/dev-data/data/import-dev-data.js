@@ -24,9 +24,7 @@ mongoose
 let tours;
 try {
 	// => javaScript object
-	tours = JSON.parse(
-		fs.readFileSync(`${__dirname}/tours-simple.json`, "utf-8"),
-	); //JSON
+	tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8")); //JSON
 } catch (err) {
 	console.error("💥Error reading json file!");
 	process.exit(1);

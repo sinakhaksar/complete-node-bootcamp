@@ -29,7 +29,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-	const tour = await Tour.findById(req.params.id); // === Tour.findOne({_id: req.prams.id})
+	const tour = await Tour.findById(req.params.id).populate("reviews"); // === Tour.findOne({_id: req.prams.id})
 
 	if (!tour) {
 		return next(new AppError("No Tour Found with that ID", 404));
@@ -43,7 +43,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 exports.createTour = catchAsync(async (req, res, next) => {
-	const newTour = await Tour.create(req.body);
+	const newTour = await Tour.create(req.body); // BIG ----bug---- // sanetize bosdy don't get all the user input, there might be bad code ...
 	res.status(201).json({
 		status: "success",
 		data: { tour: newTour },
