@@ -112,6 +112,11 @@ const tourSchema = new mongoose.Schema(
 	},
 );
 
+// tours indexing ...
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 }); // compound go solo as well, so it index for price alone as well
+tourSchema.index({ slug: 1 });
+
 tourSchema.virtual("durationWeeks").get(function () {
 	return this.duration / 7;
 });
