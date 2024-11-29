@@ -14,6 +14,13 @@ router.patch(
 	authController.protect,
 	authController.uodatePassword,
 );
+
+router.get(
+	"/me",
+	authController.protect,
+	userController.getMe,
+	userController.getUser,
+);
 router.patch("/updateMe", authController.protect, userController.updateMe); // update data by user, when loged in
 router.delete("/deleteMe", authController.protect, userController.deleteMe); // set ative to false
 
