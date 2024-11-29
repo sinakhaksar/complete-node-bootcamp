@@ -44,30 +44,11 @@ exports.getTour = catchAsync(async (req, res, next) => {
 	});
 });
 
-exports.createTour = catchAsync(async (req, res, next) => {
-	const newTour = await Tour.create(req.body); // BIG ----bug---- // sanetize bosdy don't get all the user input, there might be bad code ...
-	res.status(201).json({
-		status: "success",
-		data: { tour: newTour },
-	});
-});
+exports.createTour = factory.createOne(Tour);
 
-exports.updateTour = catchAsync(async (req, res, next) => {
-	const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	});
-	if (!tour) {
-		return next(new AppError("No Tour Found with that ID", 404));
-	}
+// Do Not update Passwords with this!!!
+exports.updateTour = factory.updateOne(Tour);
 
-	res.status(200).json({
-		status: "success",
-		data: {
-			tour,
-		},
-	});
-});
 exports.deleteTour = factory.deleteOne(Tour);
 
 // exports.deleteTour = catchAsync(async (req, res, next) => {
