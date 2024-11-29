@@ -3,6 +3,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const factory = require("./handlerFactory");
 
+// needed in UpdateMe
 const filterObj = (obj, ...allowedFields) => {
 	const newObj = {};
 	Object.keys(obj).forEach((el) => {
@@ -14,18 +15,6 @@ const filterObj = (obj, ...allowedFields) => {
 	});
 	return newObj;
 };
-
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-	const users = await User.find();
-
-	// send response
-	res.status(200).json({
-		status: "success",
-		results: users.length,
-		data: { users },
-	});
-});
-
 // by user
 exports.updateMe = catchAsync(async (req, res, next) => {
 	//1) create an error if user POSTs password data
@@ -64,17 +53,12 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 exports.createUser = (req, res) => {
 	res.status(500).json({
 		status: "error",
-		message: "This route is not yet defind!",
+		message: "This route is not defind! Please /signup insted",
 	});
 };
 
-exports.getUser = (req, res) => {
-	res.status(500).json({
-		status: "error",
-		message: "This route is not yet defind!",
-	});
-};
-
+exports.getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
+// Do Not Update Passwords with this!!
 exports.updateUser = factory.updateOne(User);
-
 exports.deleteUser = factory.deleteOne(User);

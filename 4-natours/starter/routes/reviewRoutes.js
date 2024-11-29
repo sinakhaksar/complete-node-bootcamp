@@ -13,11 +13,12 @@ router
 		authController.protect,
 		authController.restrictTo("user"),
 		reviewsController.setTourUserIds,
-		reviewsController.createReviews,
+		reviewsController.createReview,
 	);
 
 router
 	.route("/:id")
+	.get(reviewsController.getReview)
 	.patch(reviewsController.updateReview)
 	.delete(reviewsController.deleteReview);
 
