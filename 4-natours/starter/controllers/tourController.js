@@ -1,5 +1,5 @@
 const Tour = require("../models/tourModel");
-// const AppError = require("../utils/appError");
+const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const factory = require("./handlerFactory");
 
@@ -78,6 +78,87 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 		status: "success",
 		data: {
 			plan,
+		},
+	});
+});
+
+// ("/tours-within/:distance/center/:latlng/unit/:unit")
+// ("/tours-within/:distance/center/36.3063688,59.4909254/unit/:unit")
+
+exports.getToursWithin = async (req, res, next) => {
+	const { distance, latlng, unit } = req.params;
+	const [lat, lng] = latlng.split(",");
+	const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+
+	if (!lat || !lng) {
+		next(
+			new AppError(
+				"Pleas provide latitutr and longitude in the format lat,lng.  ",
+				400,
+			),
+		);
+	}
+
+	// console.log(distance, lat, lng, unit);
+
+	const tours = await Tour.find({
+		startLocation: {
+			$geoWithin: { $centerSphere: [[lng, lat], radius] },
+		},
+	});
+
+	res.status(200).json({
+		status: "sucsess",
+		results: tours.length,
+		data: {
+			data: tours,
+		},
+	});
+};
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+	const { latlng, unit } = req.params;
+	const [lat, lng] = latlng.split(",");
+
+	const multiplier = unit === "mi" ? 0.000621371 : 0.001;
+	console.log(lat, lng, unit, multiplier);
+
+	if (!lat || !lng) {
+		next(
+			new AppError(
+				"Pleas provide latitutr and longitude in the format lat,lng.  ",
+				400,
+			),
+		);
+	}
+
+	const distances = await Tour.aggregate([
+		{
+			$geoNear: {
+				near: {
+					type: "Point",
+					coordinates: [parseFloat(lng), parseFloat(lat)],
+				},
+				distanceField: "distance",
+				distanceMultiplier: multiplier, // converts distance to km or mi
+				includeLocs: "startLocation",
+			},
+		},
+		{
+			$project: {
+				distance: 1,
+				name: 1,
+				startLocation: 1, //
+			},
+		},
+	]);
+	console.log(distances);
+
+	res.status(200).json({
+		status: "success",
+		kirKhar: true,
+		data: {
+			data: distances,
 		},
 	});
 });
